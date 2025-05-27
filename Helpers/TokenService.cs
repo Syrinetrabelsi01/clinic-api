@@ -18,20 +18,37 @@ namespace ClinicAPI.Helpers
 
         public string CreateToken(AppUser user)
         {
+            // Null safety for required claims
+            if (string.IsNullOrWhiteSpace(user.UserName))
+                throw new ArgumentException("UserName cannot be null or empty");
+            if (string.IsNullOrWhiteSpace(user.Email))
+                throw new ArgumentException("Email cannot be null or empty");
+
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.NameId, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role ?? "")
+                new Claim(ClaimTypes.Role, user.Role ?? "") // Role can be optional
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var jwtKey = _config["Jwt:Key"];
+            if (string.IsNullOrWhiteSpace(jwtKey))
+                throw new ArgumentException("JWT key is missing in configuration");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var expireDaysConfig = _config["Jwt:ExpireDays"];
+            if (string.IsNullOrWhiteSpace(expireDaysConfig))
+                throw new ArgumentException("ExpireDays is missing in configuration");
+
+            if (!double.TryParse(expireDaysConfig, out double expireDays))
+                throw new ArgumentException("ExpireDays must be a valid number");
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(double.Parse(_config["Jwt:ExpireDays"])),
+                Expires = DateTime.Now.AddDays(expireDays),
                 SigningCredentials = creds
             };
 

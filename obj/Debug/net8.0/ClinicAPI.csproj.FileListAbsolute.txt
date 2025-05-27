@@ -107,6 +107,7 @@
 /Users/syrine/ClinicAPI/obj/Debug/net8.0/ClinicAPI.csproj.CoreCompileInputs.cache
 /Users/syrine/ClinicAPI/obj/Debug/net8.0/ClinicAPI.MvcApplicationPartsAssemblyInfo.cs
 /Users/syrine/ClinicAPI/obj/Debug/net8.0/ClinicAPI.MvcApplicationPartsAssemblyInfo.cache
+/Users/syrine/ClinicAPI/obj/Debug/net8.0/ClinicAPI.sourcelink.json
 /Users/syrine/ClinicAPI/obj/Debug/net8.0/staticwebassets.build.json
 /Users/syrine/ClinicAPI/obj/Debug/net8.0/staticwebassets.development.json
 /Users/syrine/ClinicAPI/obj/Debug/net8.0/staticwebassets/msbuild.ClinicAPI.Microsoft.AspNetCore.StaticWebAssets.props

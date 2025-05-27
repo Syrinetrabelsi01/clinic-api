@@ -31,7 +31,11 @@ namespace ClinicAPI.Controllers
             };
 
             // 🔑 Attempt to create the user with the provided password
+            if (string.IsNullOrWhiteSpace(dto.Password))
+                return BadRequest(new { message = "Password is required" });
+
             var result = await _userManager.CreateAsync(user, dto.Password);
+
 
             if (!result.Succeeded)
             {
@@ -45,7 +49,11 @@ namespace ClinicAPI.Controllers
             }
 
             // ✅ Add the user to the specified role (Doctor, Receptionist, etc.)
+            if (string.IsNullOrWhiteSpace(dto.Role))
+                return BadRequest(new { message = "Role is required" });
+
             await _userManager.AddToRoleAsync(user, dto.Role);
+
 
             // 🔐 Generate and return a JWT token
             return Ok(new
@@ -58,9 +66,15 @@ namespace ClinicAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login(LoginDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                return BadRequest(new { message = "Email is required" });
+
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
                 return NotFound(new { message = "User not found" });
+
+            if (string.IsNullOrWhiteSpace(dto.Password))
+                return BadRequest(new { message = "Password is required" });
 
             var passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
             if (!passwordValid)
