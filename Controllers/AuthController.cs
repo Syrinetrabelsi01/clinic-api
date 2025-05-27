@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicAPI.Controllers
 {
+    [Tags("1. Authentication")]
     [ApiController]
     [Route("api/auth")]
     public class AuthController : ControllerBase

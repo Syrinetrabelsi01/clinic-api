@@ -4,6 +4,7 @@ using ClinicAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClinicAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250527130105_RebuildPatientModel")]
+    partial class RebuildPatientModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,55 +100,25 @@ namespace ClinicAPI.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("AppointmentDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("DoctorId")
-                        .IsRequired()
+                    b.Property<string>("AppUserId")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("longtext");
 
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<DateTime>("ScheduledDate")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DoctorId");
+                    b.HasIndex("AppUserId");
 
                     b.HasIndex("PatientId");
 
                     b.ToTable("Appointments");
-                });
-
-            modelBuilder.Entity("ClinicAPI.Models.MedicalProfile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Allergies")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("BloodType")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ChronicDiseases")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("PatientId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PatientId")
-                        .IsUnique();
-
-                    b.ToTable("MedicalProfiles");
                 });
 
             modelBuilder.Entity("ClinicAPI.Models.Patient", b =>
@@ -344,11 +317,9 @@ namespace ClinicAPI.Migrations
 
             modelBuilder.Entity("ClinicAPI.Models.Appointment", b =>
                 {
-                    b.HasOne("ClinicAPI.Models.AppUser", "Doctor")
+                    b.HasOne("ClinicAPI.Models.AppUser", "AppUser")
                         .WithMany("Appointments")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("AppUserId");
 
                     b.HasOne("ClinicAPI.Models.Patient", "Patient")
                         .WithMany("Appointments")
@@ -356,18 +327,7 @@ namespace ClinicAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("ClinicAPI.Models.MedicalProfile", b =>
-                {
-                    b.HasOne("ClinicAPI.Models.Patient", "Patient")
-                        .WithOne("MedicalProfile")
-                        .HasForeignKey("ClinicAPI.Models.MedicalProfile", "PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("AppUser");
 
                     b.Navigation("Patient");
                 });
@@ -442,8 +402,6 @@ namespace ClinicAPI.Migrations
             modelBuilder.Entity("ClinicAPI.Models.Patient", b =>
                 {
                     b.Navigation("Appointments");
-
-                    b.Navigation("MedicalProfile");
 
                     b.Navigation("Prescriptions");
                 });

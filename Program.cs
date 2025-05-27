@@ -15,26 +15,28 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     )
 );
 
-// ✅ Identity
+// ✅ Identity (Authentication)
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// ✅ Token service + AutoMapper
+// ✅ Token Service
 builder.Services.AddScoped<TokenService>();
+
+// ✅ AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// ✅ Controller setup + JSON config
+// ✅ Controllers
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-    );
+    .AddJsonOptions(x =>
+        x.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
 
-// ✅ Swagger + JWT token support
+// ✅ Swagger + JWT
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ClinicAPI", Version = "v1" });
 
+    // 🔐 JWT Token setup
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: `Bearer <token>`",
@@ -44,10 +46,13 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
-            new OpenApiSecurityScheme {
-                Reference = new OpenApiReference {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 }
@@ -59,26 +64,25 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ✅ Middleware pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
+// ✅ Middleware
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers(); // 🔐 Crucial for routing controllers
+app.MapControllers();
 
-// ✅ Debug startup
-Console.WriteLine("🚀 Program.cs reached end, app running...");
+// ✅ Swagger UI
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(); // One page, all endpoints
+}
 
-// ✅ Seed roles + admin
+// ✅ Seed Roles & Admin
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await DbInitializer.SeedRolesAndAdminAsync(services);
 }
 
+Console.WriteLine("✅ App running...");
 app.Run();

@@ -8,6 +8,7 @@ namespace ClinicAPI.Models
         public string? Role { get; set; }
 
         // Navigation property for doctor’s appointments
-        public ICollection<Appointment>? Appointments { get; set; }
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+
     }
 }

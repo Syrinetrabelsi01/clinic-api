@@ -3,39 +3,57 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ClinicAPI.Data
 {
-    public class DbInitializer
+    public static class DbInitializer
     {
         public static async Task SeedRolesAndAdminAsync(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
 
-            string[] roles = new[] { "Admin", "Doctor", "Receptionist" };
+            string[] roles = { "Admin", "Doctor", "Receptionist" };
 
+            // ✅ 1. Seed Roles
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
+                {
                     await roleManager.CreateAsync(new IdentityRole(role));
+                    Console.WriteLine($"✅ Created role: {role}");
+                }
             }
 
-            // Create default admin
-            var adminEmail = "admin@clinic.com";
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            // ✅ 2. Seed Users
 
-            if (adminUser == null)
+            var users = new List<(string Username, string Email, string Password, string Role)>
             {
-                var user = new AppUser
-                {
-                    UserName = "admin",
-                    Email = adminEmail,
-                    EmailConfirmed = true,
-                    Role = "Admin"
-                };
+                ("admin", "admin@clinic.com", "Admin123!", "Admin"),
+                ("dr.yassine", "doctor@clinic.com", "Doctor123!", "Doctor"),
+                ("lina", "reception@clinic.com", "Reception123!", "Receptionist")
+            };
 
-                var result = await userManager.CreateAsync(user, "Admin123!"); // Replace with a stronger password
-                if (result.Succeeded)
+            foreach (var (username, email, password, role) in users)
+            {
+                if (await userManager.FindByEmailAsync(email) == null)
                 {
-                    await userManager.AddToRoleAsync(user, "Admin");
+                    var user = new AppUser
+                    {
+                        UserName = username,
+                        Email = email,
+                        Role = role
+                    };
+
+                    var result = await userManager.CreateAsync(user, password);
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, role);
+                        Console.WriteLine($"✅ Created {role}: {username} ({email})");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"❌ Failed to create {role}: {email}");
+                        foreach (var error in result.Errors)
+                            Console.WriteLine($" - {error.Description}");
+                    }
                 }
             }
         }
