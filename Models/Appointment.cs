@@ -9,12 +9,12 @@ namespace ClinicAPI.Models
     {
         public int Id { get; set; }
         public DateTime ScheduledDate { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
         public int PatientId { get; set; }
-        public Patient Patient { get; set; }
+        public Patient? Patient { get; set; }
 
-        public string AppUserId { get; set; }  // Doctor
-        public AppUser AppUser { get; set; }
+        public string? AppUserId { get; set; }  // Doctor
+        public AppUser? AppUser { get; set; }
     }
 }
