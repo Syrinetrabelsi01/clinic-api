@@ -1,0 +1,19 @@
+{
+  "Version": 1,
+  "Hash": "qp8XGpwAmle/fj5HWlO8MeNR5lRGh8jPZnt/smfTNBs=",
+  "Source": "ClinicAPI",
+  "BasePath": "_content/ClinicAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "ClinicAPI/wwwroot",
+      "Source": "ClinicAPI",
+      "ContentRoot": "/Users/syrine/ClinicAPI/wwwroot/",
+      "BasePath": "_content/ClinicAPI",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": []
+}
